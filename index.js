@@ -1,5 +1,6 @@
 const express = require('express')
 const cors = require('cors');
+require('dotenv').config()
 
 const app = express()
 app.use(cors())
@@ -7,7 +8,8 @@ app.use(express.json())
 const port = process.env.PORT || 5000
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://Noor-26:noor123228@cluster0.296sc.mongodb.net/?retryWrites=true&w=majority";
+const { Cursor } = require('mongoose');
+const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.296sc.mongodb.net/?retryWrites=true&w=majorit`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 const run = async () => { 
@@ -17,6 +19,12 @@ const run = async () => {
         
         app.get('/chats',async (req,res) => {
             const chats = await chatCollection.find().toArray()
+            res.send(chats);
+        })
+        app.get('/chats/:id ',async (req,res) => {
+            const id = req.params.id
+            const cursor = {_id:id}
+            const chats = await chatCollection.findOne(cursor)
             res.send(chats);
         })
     }
