@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors');
 require('dotenv').config()
+const jwt = require('jsonwebtoken');
 
 const app = express()
 app.use(cors())
@@ -26,6 +27,18 @@ const run = async () => {
             const cursor = {_id:id}
             const chats = await chatCollection.findOne(cursor)
             res.send(chats);
+        })
+        app.put('/users/:email',async(req,res)=>{
+            const email = req.params.email
+            const user = req.body
+            const filter = {email:email}
+            const options = {upsert:true}
+            const updateDoc={
+                $set:user
+            }
+            const result = await userCollection.updateOne(filter,updateDoc,options)
+            const token = jwt.sign({email:email},process.env.ACCESS_TOKEN,{expiresIn:'10h'})
+            res.send({result,token});
         })
     }
 
